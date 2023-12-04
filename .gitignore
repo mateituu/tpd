@@ -1,0 +1,6 @@
+WVDs/
+venv/
+keys/
+Config/
+__pycache__/
+*.pyc
