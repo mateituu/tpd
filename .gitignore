@@ -1,0 +1,7 @@
+WVDs/
+venv/
+keys/
+Config/
+download/
+binaries/
+*.pyc
