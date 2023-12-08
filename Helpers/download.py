@@ -179,7 +179,7 @@ def youtube_dlp(url: str = None, device: str = None, api_key: str = None, remote
         'copy',
         '-acodec',
         'copy',
-        f"{os.getcwd()}/downloads/{final_mux}.mkv",
+        f"{os.getcwd()}/download/{final_mux}.mkv",
     ]
 
     # Run ffmpeg to merge the files
