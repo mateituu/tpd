@@ -1,15 +1,18 @@
 import subprocess
-from os import urandom
 import uuid
 import glob
 import os
 import Helpers.binary_check
 import Sites.Generic
 import license_curl
+import Helpers.os_check
 
 
 # Web Download function generic
 def web_dl_generic(mpd: str = None, device: str = None, api_key: str = None, remote: bool = False):
+
+    # Get the current operating system
+    operating_system = Helpers.os_check.get_os_specific()
 
     # Check for folders
     Helpers.binary_check.create_folders()
@@ -45,6 +48,10 @@ def web_dl_generic(mpd: str = None, device: str = None, api_key: str = None, rem
         '--mux-after-done',
         'format=mkv'
     ] + mp4decrypt_keys
+    if operating_system == "Linux":
+        n_m3u8dl_re_download[0] = f'{os.getcwd()}/binaries/N_m3u8DL-RE'
+        n_m3u8dl_re_download[3] = f'{os.getcwd()}/binaries/ffmpeg'
+        n_m3u8dl_re_download[5] = f'{os.getcwd()}/binaries/mp4decrypt'
 
     subprocess.run(n_m3u8dl_re_download)
 
@@ -57,6 +64,9 @@ def web_dl_generic(mpd: str = None, device: str = None, api_key: str = None, rem
 
 # Web Download crunchyroll function
 def web_dl_crunchyroll(mpd: str = None, device: str = None, api_key: str = None, remote: bool = False):
+
+    # Get the current operating system
+    operating_system = Helpers.os_check.get_os_specific()
 
     # Check for folders
     Helpers.binary_check.create_folders()
@@ -94,6 +104,10 @@ def web_dl_crunchyroll(mpd: str = None, device: str = None, api_key: str = None,
         '--mux-after-done',
         'format=mkv'
     ] + mp4decrypt_keys
+    if operating_system == "Linux":
+        n_m3u8dl_re_download[0] = f'{os.getcwd()}/binaries/N_m3u8DL-RE'
+        n_m3u8dl_re_download[5] = f'{os.getcwd()}/binaries/ffmpeg'
+        n_m3u8dl_re_download[7] = f'{os.getcwd()}/binaries/mp4decrypt'
 
     subprocess.run(n_m3u8dl_re_download)
 
@@ -106,6 +120,9 @@ def web_dl_crunchyroll(mpd: str = None, device: str = None, api_key: str = None,
 
 # YouTube Download function generic
 def youtube_dlp(url: str = None, device: str = None, api_key: str = None, remote: bool = False):
+
+    # Get the current operating system
+    operating_system = Helpers.os_check.get_os_specific()
 
     # Check for folders
     Helpers.binary_check.create_folders()
@@ -136,6 +153,8 @@ def youtube_dlp(url: str = None, device: str = None, api_key: str = None, remote
         'res:720',
         f'{url}'
     ]
+    if operating_system == "Linux":
+        yt_dlp_download[0] = f'{os.getcwd()}/binaries/yt-dlp'
 
     # Run yt-dlp
     subprocess.run(yt_dlp_download)
@@ -158,6 +177,8 @@ def youtube_dlp(url: str = None, device: str = None, api_key: str = None, remote
             f'{file}',
             f'{os.getcwd()}/download/{file_name}',
         ] + mp4decrypt_keys
+        if operating_system == "Linux":
+            mp4_decrypt[0] = f'{os.getcwd()}/binaries/mp4decrypt'
 
         # Run mp4decrypt
         subprocess.run(mp4_decrypt)
@@ -181,6 +202,8 @@ def youtube_dlp(url: str = None, device: str = None, api_key: str = None, remote
         'copy',
         f"{os.getcwd()}/download/{final_mux}.mkv",
     ]
+    if operating_system == "Linux":
+        ffmpeg_merge[0] = f"{os.getcwd()}/binaries/ffmpeg"
 
     # Run ffmpeg to merge the files
     subprocess.run(ffmpeg_merge)

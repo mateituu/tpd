@@ -18,6 +18,6 @@ How to use:
 
 7. Paste dictionaries from license request curl post request into `License_curl.py`
 
-8. Run with `python tpd-keys.py`
+8. Run with `python tpd-keys.py` for just decryption keys or `python tpd-keys.py --web-dl` to get decryption keys plus download the content 
 
 To view additional options you can use `python tpd-keys.py -h`

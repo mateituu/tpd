@@ -6,3 +6,4 @@ from . import cache_key
 from . import mpd_parse
 from . import download
 from . import binary_check
+from . import os_check

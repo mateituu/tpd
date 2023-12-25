@@ -1,5 +1,4 @@
 # Import dependencies
-import os
 import Helpers
 import Sites
 import license_curl
@@ -30,8 +29,6 @@ parser.add_argument('--web-dl', help="Web download", action='store_true')
 # Assign the switches a variable
 switches = parser.parse_args()
 
-
-# Based on the selected switch within the mutually exclusive group, perform actions
 if switches.crunchyroll:
     # Perform action for --crunchyroll
     if switches.web_dl:
@@ -50,6 +47,7 @@ elif switches.crunchyroll_remote:
         print(f'Saved at {file[0]}')
     else:
         Sites.Crunchyroll.decrypt_crunchyroll_remotely(api_key=api_key, license_curl_headers=license_curl.headers)
+
 
 elif switches.youtube:
     # Perform action for --YouTube
