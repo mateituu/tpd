@@ -29,7 +29,7 @@ def create_binaries():
 
     # Set binary dictionaries for Windows / Linux
     windows_binaries = ["n_m3u8dl-re.exe", "mp4decrypt.exe", "ffmpeg.exe", "yt-dlp.exe"]
-    linux_binaries = ["n_m3u8dl-re", "mp4decrypt", "ffmpeg"]
+    linux_binaries = ["N_m3u8DL-RE", "mp4decrypt", "ffmpeg", "yt-dlp"]
     if operating_system == "Windows":
         binary_list = windows_binaries
     if operating_system == "Linux":
@@ -174,7 +174,7 @@ def create_binaries():
                 print()
 
             # n_m3u8dl-re
-            elif binary == "n_m3u8dl-re.exe" or binary == "n_m3u8dl-re":
+            elif binary == "n_m3u8dl-re.exe" or binary == "N_m3u8DL-RE":
 
                 # Download n_m3u8dl-re zip file
                 if operating_system == "Windows":
@@ -259,7 +259,7 @@ def create_binaries():
                         stream=True)
                 if operating_system == "Linux":
                     yt_dlp_download = requests.get(
-                        "https://github.com/yt-dlp/yt-dlp/releases/download/2023.11.16/yt-dlp_linux",
+                        "https://github.com/yt-dlp/yt-dlp/releases/download/2023.11.16/yt-dlp.tar.gz",
                         stream=True)
                 total_size = int(yt_dlp_download.headers.get('content-length', 0))
                 if operating_system == "Windows":
@@ -270,12 +270,22 @@ def create_binaries():
                                 download.write(data)
                                 progress_bar.update(len(data))
                 if operating_system == "Linux":
-                    with open(f"{os.getcwd()}/download/yt-dlp", 'wb') as download:
+                    with open(f"{os.getcwd()}/download/temp/yt-dlp.tar.gz", 'wb') as download:
                         with tqdm(total=total_size, unit='B', unit_scale=True,
                                   desc="Downloading yt-dlp") as progress_bar:
                             for data in yt_dlp_download.iter_content(chunk_size=1024):
                                 download.write(data)
                                 progress_bar.update(len(data))
+
+                # Untar yt-dlp if Linux
+                if operating_system == "Linux":
+                    with tarfile.open(f"{os.getcwd()}/download/temp/yt-dlp.tar.gz", 'r:gz') as yt_dlp_tar_gz:
+                        file_count = len(yt_dlp_tar_gz.getmembers())
+                        with tqdm(total=file_count, unit='file',
+                                  desc=f"Extracting yt-dlp.tar.gz") as untar_gz_progress_bar:
+                            for file in yt_dlp_tar_gz:
+                                yt_dlp_tar_gz.extract(file, path=f"{os.getcwd()}/download/temp")
+                                untar_gz_progress_bar.update(1)
 
                 # Copy yt-dlp binary to binaries if Windows
                 if operating_system == "Windows":
@@ -284,9 +294,9 @@ def create_binaries():
 
                 # Copy yt-dlp binary to binaries if Linux
                 if operating_system == "Linux":
-                    shutil.copy2(f"{os.getcwd()}/download/yt-dlp",
+                    shutil.copy2(f"{os.getcwd()}/download/temp/yt-dlp/yt-dlp",
                                  f"{os.getcwd()}/binaries")
-                    os.chmod(f"{os.getcwd()}/binaries/yt-dlp", stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
+                    subprocess.run(['chmod', '+x', f"{os.getcwd()}/binaries/yt-dlp"])
 
                 # Remove binary from download folder if Windows
                 if operating_system == "Windows":
@@ -294,7 +304,7 @@ def create_binaries():
 
                 # Remove binary from download folder if Linux
                 if operating_system == "Linux":
-                    os.remove(f"{os.getcwd()}/download/yt-dlp")
+                    shutil.rmtree(f"{os.getcwd()}/download/temp/yt-dlp")
 
                 # Print a new line
                 print()
