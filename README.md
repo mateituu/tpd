@@ -6,7 +6,7 @@
 How to use:
 1. Create `TPD-Keys` folder.
 
-2. Download and extract `TPD-Keys.py`, `requirements.txt` and `License_curl.py` into the newly created `TPD-Keys` directory
+2. Download and extract `TPD-Keys.py`, `requirements.txt`, `license_curl.py` and the `Helpers` and `Sites` folder into the newly created `TPD-Keys` directory
 
 3. Install the requirements with `pip install -r requirements.txt`
 
