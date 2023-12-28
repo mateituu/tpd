@@ -25,9 +25,9 @@ def web_dl_generic(mpd: str = None, device: str = None, api_key: str = None, rem
 
     # Retrieve the keys
     if not remote:
-        mp4decrypt_keys = Sites.Generic.decrypt_generic(mpd_url=mpd, wvd=device, license_curl_headers=license_curl.headers)
+        mp4decrypt_keys, _ = Sites.Generic.decrypt_generic(mpd_url=mpd, wvd=device, license_curl_headers=license_curl.headers)
     if remote:
-        mp4decrypt_keys = Sites.Generic.decrypt_generic_remotely(api_key=api_key, license_curl_headers=license_curl.headers, mpd_url=mpd)
+        mp4decrypt_keys, _ = Sites.Generic.decrypt_generic_remotely(api_key=api_key, license_curl_headers=license_curl.headers, mpd_url=mpd)
 
     # Define n_m3u8dl-re download parameters
     n_m3u8dl_re_download = [
@@ -79,9 +79,9 @@ def web_dl_crunchyroll(mpd: str = None, device: str = None, api_key: str = None,
 
     # Retrieve the keys
     if not remote:
-        mp4decrypt_keys = Sites.Crunchyroll.decrypt_crunchyroll(mpd_url=mpd, wvd=device, license_curl_headers=license_curl.headers)
+        mp4decrypt_keys, _ = Sites.Crunchyroll.decrypt_crunchyroll(mpd_url=mpd, wvd=device, license_curl_headers=license_curl.headers)
     if remote:
-        mp4decrypt_keys = Sites.Crunchyroll.decrypt_crunchyroll_remotely(api_key=api_key, license_curl_headers=license_curl.headers, mpd_url=mpd)
+        mp4decrypt_keys, _ = Sites.Crunchyroll.decrypt_crunchyroll_remotely(api_key=api_key, license_curl_headers=license_curl.headers, mpd_url=mpd)
 
     # Define n_m3u8dl-re download parameters
     n_m3u8dl_re_download = [
@@ -135,9 +135,9 @@ def youtube_dlp(url: str = None, device: str = None, api_key: str = None, remote
 
     # Retrieve the keys
     if not remote:
-        mp4decrypt_keys = Sites.YouTube.decrypt_youtube(wvd=device, license_curl_headers=license_curl.headers, license_curl_json=license_curl.json_data, license_curl_cookies=license_curl.cookies)
+        mp4decrypt_keys, _ = Sites.YouTube.decrypt_youtube(wvd=device, license_curl_headers=license_curl.headers, license_curl_json=license_curl.json_data, license_curl_cookies=license_curl.cookies)
     if remote:
-        mp4decrypt_keys = Sites.YouTube.decrypt_youtube_remotely(api_key=api_key, license_curl_headers=license_curl.headers, license_curl_json=license_curl.json_data, license_curl_cookies=license_curl.cookies)
+        mp4decrypt_keys, _ = Sites.YouTube.decrypt_youtube_remotely(api_key=api_key, license_curl_headers=license_curl.headers, license_curl_json=license_curl.json_data, license_curl_cookies=license_curl.cookies)
 
     # Define yt-dlp download parameters
     yt_dlp_download = [

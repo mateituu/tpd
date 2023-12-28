@@ -21,6 +21,7 @@ services.add_argument('--crunchyroll', action='store_true', help="Decrypt Crunch
 services.add_argument('--crunchyroll-remote', action='store_true', help="Decrypt Crunchyroll remotely")
 services.add_argument('--youtube', action='store_true', help="Decrypt YouTube")
 services.add_argument('--youtube-remote', action='store_true', help="Decrypt YouTube remotely")
+services.add_argument('--generic', action='store_true', help="Decrypt generic services")
 services.add_argument('--generic-remote', action='store_true', help="Decrypt generic services remotely")
 
 # Add web download switch
@@ -79,7 +80,7 @@ elif switches.generic_remote:
         Sites.Generic.decrypt_generic_remotely(api_key=api_key, license_curl_headers=license_curl.headers)
 
 
-else:
+elif switches.generic:
     # If no switch is provided, perform a default action
     if switches.web_dl:
         mpd = input("MPD URL: ")
@@ -87,3 +88,6 @@ else:
         print(f'Saved at {file[0]}')
     else:
         Sites.Generic.decrypt_generic(wvd=device, license_curl_headers=license_curl.headers)
+
+else:
+    Helpers.gui.start_gui(wvd=device, api_key=api_key)

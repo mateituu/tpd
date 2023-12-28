@@ -304,6 +304,7 @@ def create_binaries():
 
                 # Remove binary from download folder if Linux
                 if operating_system == "Linux":
+                    os.remove(f"{os.getcwd()}/download/temp/yt-dlp.tar.gz")
                     shutil.rmtree(f"{os.getcwd()}/download/temp/yt-dlp")
 
                 # Print a new line

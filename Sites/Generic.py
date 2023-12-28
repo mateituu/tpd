@@ -10,7 +10,8 @@ import Helpers
 
 
 # Defining decrypt function for generic services
-def decrypt_generic(wvd: str = None, license_curl_headers: dict = None, mpd_url: str = None):
+def decrypt_generic(wvd: str = None, license_curl_headers: dict = None, mpd_url: str = None,
+                    in_pssh: str = None, in_license_url: str = None):
 
     # Exit if no device
     if wvd is None:
@@ -25,16 +26,22 @@ def decrypt_generic(wvd: str = None, license_curl_headers: dict = None, mpd_url:
             input_pssh = input(f"\nPSSH not found! Input PSSH: ")
 
     # Ask for PSSH if just keys function
-    if mpd_url is None:
+    if mpd_url is None and in_pssh is None:
         # Ask for PSSH if web-dl not selected:
         input_pssh = input(f"\nPSSH: ")
 
 
     # prepare pssh
-    pssh = PSSH(input_pssh)
+    if in_pssh is None:
+        pssh = PSSH(input_pssh)
+    if in_pssh is not None:
+        pssh = PSSH(in_pssh)
 
     # Ask for license URL
-    license_url = input(f"\nLicense URL: ")
+    if in_license_url is None:
+        license_url = input(f"\nLicense URL: ")
+    if in_license_url is not None:
+        license_url = in_license_url
 
     # load device
     device = Device.load(wvd)
@@ -97,16 +104,21 @@ def decrypt_generic(wvd: str = None, license_curl_headers: dict = None, mpd_url:
     cdm.close(session_id)
 
     # Cache the keys
-    Helpers.cache_key.cache_keys(pssh=input_pssh, keys=returned_keys)
+    if in_pssh is None:
+        Helpers.cache_key.cache_keys(pssh=input_pssh, keys=returned_keys)
+    if in_pssh is not None:
+        Helpers.cache_key.cache_keys(pssh=in_pssh, keys=returned_keys)
 
     # Print out the keys
     print(f'\nKeys:\n{returned_keys}')
 
     # Return the keys for future ripper use.
-    return mp4decrypt_keys
+    return mp4decrypt_keys, returned_keys
+
 
 # Defining remote decrypt function for generic services
-def decrypt_generic_remotely(api_key: str = None, license_curl_headers: dict = None, mpd_url: str = None):
+def decrypt_generic_remotely(api_key: str = None, license_curl_headers: dict = None, mpd_url: str = None,
+                             in_pssh: str = None, in_license_url: str = None):
 
     # Exit if no API key
     if api_key is None:
@@ -119,7 +131,7 @@ def decrypt_generic_remotely(api_key: str = None, license_curl_headers: dict = N
     api_device = "CDM"
 
     # Try getting pssh via MPD URL if web-dl
-    if mpd_url is not None:
+    if mpd_url is not None and in_pssh is None:
         input_pssh = Helpers.mpd_parse.parse_pssh(mpd_url)
         if input_pssh is not None:
             print(f'\nPSSH found: {input_pssh}')
@@ -127,12 +139,18 @@ def decrypt_generic_remotely(api_key: str = None, license_curl_headers: dict = N
             input_pssh = input(f"\nPSSH not found! Input PSSH: ")
 
     # Ask for PSSH if just keys function
-    if mpd_url is None:
+    if mpd_url is None and in_pssh is None:
         # Ask for PSSH if web-dl not selected:
         input_pssh = input(f"\nPSSH: ")
 
+    if in_pssh is not None:
+        input_pssh = in_pssh
+
     # Ask for license URL
-    input_license_url = input(f"\nLicense URL: ")
+    if in_license_url is None:
+        input_license_url = input(f"\nLicense URL: ")
+    if in_license_url is not None:
+        input_license_url = in_license_url
 
     # Set headers for API key
     api_key_headers = {
@@ -197,6 +215,7 @@ def decrypt_generic_remotely(api_key: str = None, license_curl_headers: dict = N
     # Cache the keys
     Helpers.cache_key.cache_keys(pssh=input_pssh, keys=returned_keys)
 
+
     # Print out keys
     print(f'\nKeys:\n{returned_keys}')
 
@@ -204,4 +223,4 @@ def decrypt_generic_remotely(api_key: str = None, license_curl_headers: dict = N
     requests.get(url=f'{api_url}/{api_device}/close/{session_id}', headers=api_key_headers)
 
     # Return mp4decrypt keys
-    return mp4decrypt_keys
+    return mp4decrypt_keys, returned_keys

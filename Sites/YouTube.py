@@ -10,7 +10,8 @@ import Helpers
 
 
 # Defining decrypt function for YouTube
-def decrypt_youtube(wvd: str = None, license_curl_headers: dict = None, license_curl_cookies: dict = None, license_curl_json: dict = None):
+def decrypt_youtube(wvd: str = None, license_curl_headers: dict = None, license_curl_cookies: dict = None, license_curl_json: dict = None,
+                    in_license_url: str = None):
 
     # Exit if no device
     if wvd is None:
@@ -19,8 +20,11 @@ def decrypt_youtube(wvd: str = None, license_curl_headers: dict = None, license_
     # prepare pssh
     pssh = PSSH("AAAAQXBzc2gAAAAA7e+LqXnWSs6jyCfc1R0h7QAAACEiGVlUX01FRElBOjZlMzI4ZWQxYjQ5YmYyMWZI49yVmwY=")
 
-    # Ask for the license URL
-    license_url = input("License URL: ")
+    # Ask for license URL
+    if in_license_url is None:
+        license_url = input(f"\nLicense URL: ")
+    if in_license_url is not None:
+        license_url = in_license_url
 
     # Print a new line between PSSH/License URL and keys
     print("\n")
@@ -81,11 +85,12 @@ def decrypt_youtube(wvd: str = None, license_curl_headers: dict = None, license_
     print(f'Keys:\n{returned_keys}')
 
     # Return the keys for future ripper use.
-    return mp4decrypt_keys
+    return mp4decrypt_keys, returned_keys
 
 
 # Defining remote decrypt function for YouTube
-def decrypt_youtube_remotely(api_key: str = None, license_curl_headers: dict = None, license_curl_json: dict = None, license_curl_cookies: dict = None):
+def decrypt_youtube_remotely(api_key: str = None, license_curl_headers: dict = None, license_curl_json: dict = None, license_curl_cookies: dict = None,
+                             in_license_url: str = None):
 
     # Exit if no API key
     if api_key is None:
@@ -98,7 +103,10 @@ def decrypt_youtube_remotely(api_key: str = None, license_curl_headers: dict = N
     api_device = "CDM"
 
     # Ask for License URL
-    input_license_url = input("License URL: ")
+    if in_license_url is None:
+        input_license_url = input(f"\nLicense URL: ")
+    if in_license_url is not None:
+        input_license_url = in_license_url
 
     # Print a line between license URL and keys
     print("\n")
@@ -177,4 +185,4 @@ def decrypt_youtube_remotely(api_key: str = None, license_curl_headers: dict = N
     requests.get(url=f'{api_url}/{api_device}/close/{session_id}', headers=api_key_headers)
 
     # Return mp4decrypt keys
-    return mp4decrypt_keys
+    return mp4decrypt_keys, returned_keys

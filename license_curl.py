@@ -3,13 +3,12 @@ headers = {
     'Accept': '*/*',
     'Accept-Language': 'en-US,en;q=0.5',
     # 'Accept-Encoding': 'gzip, deflate, br',
-    'Content-Type': 'application/octet-stream',
     'DNT': '1',
+    'Connection': 'keep-alive',
     'Sec-Fetch-Dest': 'empty',
     'Sec-Fetch-Mode': 'cors',
-    'Sec-Fetch-Site': 'same-site',
+    'Sec-Fetch-Site': 'cross-site',
     'Sec-GPC': '1',
-    'Connection': 'keep-alive',
     # Requests doesn't support trailers
     # 'TE': 'trailers',
 }

@@ -10,7 +10,8 @@ import Helpers
 
 
 # Defining decrypt function for Crunchyroll
-def decrypt_crunchyroll(wvd: str = None, license_curl_headers: dict = None, mpd_url: str = None):
+def decrypt_crunchyroll(wvd: str = None, license_curl_headers: dict = None, mpd_url: str = None,
+                        in_pssh: str = None):
 
     # Exit if no device
     if wvd is None:
@@ -25,12 +26,15 @@ def decrypt_crunchyroll(wvd: str = None, license_curl_headers: dict = None, mpd_
             input_pssh = input(f"\nPSSH not found! Input PSSH: ")
 
     # Ask for PSSH if just keys function
-    if mpd_url is None:
+    if mpd_url is None and in_pssh is None:
         # Ask for PSSH if web-dl not selected:
         input_pssh = input(f"\nPSSH: ")
 
     # prepare pssh
-    pssh = PSSH(input_pssh)
+    if in_pssh is None:
+        pssh = PSSH(input_pssh)
+    if in_pssh is not None:
+        pssh = PSSH(in_pssh)
 
     # load device
     device = Device.load(wvd)
@@ -93,17 +97,21 @@ def decrypt_crunchyroll(wvd: str = None, license_curl_headers: dict = None, mpd_
     cdm.close(session_id)
 
     # Cache the keys
-    Helpers.cache_key.cache_keys(pssh=input_pssh, keys=returned_keys)
+    if in_pssh is None:
+        Helpers.cache_key.cache_keys(pssh=input_pssh, keys=returned_keys)
+    if in_pssh is not None:
+        Helpers.cache_key.cache_keys(pssh=in_pssh, keys=returned_keys)
 
     # Print out the keys
     print(f'\nKeys:\n{returned_keys}')
 
     # Return the keys for future ripper use.
-    return mp4decrypt_keys
+    return mp4decrypt_keys, returned_keys
 
 
 # Defining remote decrypt function for Crunchyroll
-def decrypt_crunchyroll_remotely(api_key: str = None, license_curl_headers: dict = None, mpd_url: str = None):
+def decrypt_crunchyroll_remotely(api_key: str = None, license_curl_headers: dict = None, mpd_url: str = None,
+                                 in_pssh: str = None):
 
     # Exit if no device
     if api_key is None:
@@ -116,7 +124,7 @@ def decrypt_crunchyroll_remotely(api_key: str = None, license_curl_headers: dict
     api_device = "CDM"
 
     # Try getting pssh via MPD URL if web-dl
-    if mpd_url is not None:
+    if mpd_url is not None and in_pssh is None:
         input_pssh = Helpers.mpd_parse.parse_pssh(mpd_url)
         if input_pssh is not None:
             print(f'\nPSSH found: {input_pssh}')
@@ -124,9 +132,12 @@ def decrypt_crunchyroll_remotely(api_key: str = None, license_curl_headers: dict
             input_pssh = input(f"\nPSSH not found! Input PSSH: ")
 
     # Ask for PSSH if just keys function
-    if mpd_url is None:
+    if mpd_url is None and in_pssh is None:
         # Ask for PSSH if web-dl not selected:
         input_pssh = input(f"\nPSSH: ")
+
+    if in_pssh is not None:
+        input_pssh = in_pssh
 
     # Set headers for API key
     api_key_headers = {
@@ -198,4 +209,4 @@ def decrypt_crunchyroll_remotely(api_key: str = None, license_curl_headers: dict
     requests.get(url=f'{api_url}/{api_device}/close/{session_id}', headers=api_key_headers)
 
     # return mp4decrypt keys
-    return mp4decrypt_keys
+    return mp4decrypt_keys, returned_keys
