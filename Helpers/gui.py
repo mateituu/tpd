@@ -16,52 +16,45 @@ def start_gui(wvd: str = None, api_key: str = None):
 
     sg.theme('Dark Amber')    # Add theme
 
-    # 1- the layout
+    # the layout
     left_frame_normal = sg.Col([
-              [sg.Text('PSSH:'), sg.Text(size=(15, 1), key='-PSSH_TEXT-')],
+              [sg.Text('PSSH:'), sg.Text(size=(15, 1), key='-PSSH_TEXT-', expand_x=True, expand_y=True)],
               [sg.Input(key="-PSSH-")],
-              [sg.Text(text='License URL:'), sg.Text(size=(15, 1), key='-LIC_URL_TEXT-')],
+              [sg.Text(text='License URL:'), sg.Text(size=(15, 1), key='-LIC_URL_TEXT-', expand_x=True, expand_y=True)],
               [sg.Input(key='-LIC_URL-')],
               [sg.Text('Keys:')],
-              [sg.Output(size=(45, 6), key='-OUTPUT-')],
+              [sg.Output(size=(45, 6), key='-OUTPUT-', expand_y=True, expand_x=True)],
               [sg.Button('Decrypt'), sg.Button('Reset')]
-        ], p=0)
+        ], expand_x=True, expand_y=True)
 
     right_frame_normal = sg.Col([
         [sg.Text('Headers:')],
-        [sg.Multiline(key='-HEADERS-', size=(50, 10))],
+        [sg.Multiline(key='-HEADERS-', size=(50, 10), expand_x=True, expand_y=True)],
         [sg.Text('JSON:', key='-JSON_TEXT-', visible=False)],
-        [sg.Multiline(key='-JSON-', size=(50, 10), visible=False)],
+        [sg.Multiline(key='-JSON-', size=(50, 10), visible=False, expand_x=True, expand_y=True)],
         [sg.Text('Cookies:', key='-COOKIES_TEXT-', visible=False)],
-        [sg.Multiline(key='-COOKIES-', size=(50, 10), visible=False)],
-        [sg.Combo(values=['Generic', 'Crunchyroll', 'YouTube'], default_value='Generic', key='-OPTIONS-', enable_events=True),sg.Push(), sg.Checkbox(text="Use CDM-Project API", key='-USE_API-')]
-    ], p=0)
+        [sg.Multiline(key='-COOKIES-', size=(50, 10), visible=False, expand_x=True, expand_y=True)],
+        [sg.Combo(values=['Generic', 'Crunchyroll', 'YouTube'], default_value='Generic', key='-OPTIONS-', enable_events=True), sg.Push(), sg.Checkbox(text="Use CDM-Project API", key='-USE_API-')]
+    ], expand_x=True, expand_y=True)
 
     window_layout = [
         [left_frame_normal, right_frame_normal]
     ]
 
-    # 2 - the window
-    window = sg.Window('TPD-Keys', layout=window_layout)
+    # the window
+    window = sg.Window('TPD-Keys', layout=window_layout, resizable=True)
 
-    # 3 - the event loop
+    # the event loop
     while True:
 
         event, values = window.read()
 
+        # Action for window close event
         if event == sg.WIN_CLOSED:
             break
 
+        # Action for Decrypt for Generic decrypt if fields are filled out
         if event == 'Decrypt':
-
-            if values['-PSSH-'] != '' and values['-LIC_URL-'] == '' and values['-OPTIONS-'] == 'Generic':
-                window['-OUTPUT-'].update(f"No License URL provided")
-
-            if values['-LIC_URL-'] != '' and values['-PSSH-'] == '' and values['-OPTIONS-'] == 'Generic':
-                window['-OUTPUT-'].update(f"No PSSH provided")
-
-            if values['-PSSH-'] == '' and values['-LIC_URL-'] == '' and values['-OPTIONS-'] == 'Generic':
-                window['-OUTPUT-'].update(f"No PSSH or License URL provided")
 
             if values['-PSSH-'] != '' and values['-LIC_URL-'] != '' and values['-OPTIONS-'] == 'Generic':
                 if values['-HEADERS-'] == '':
@@ -99,6 +92,19 @@ def start_gui(wvd: str = None, api_key: str = None):
                         except Exception as error:
                             window['-OUTPUT-'].update(f"{error}")
 
+            # Error for no license URL - Generic
+            if values['-PSSH-'] != '' and values['-LIC_URL-'] == '' and values['-OPTIONS-'] == 'Generic':
+                window['-OUTPUT-'].update(f"No License URL provided")
+
+            # Error for no PSSH - Generic
+            if values['-LIC_URL-'] != '' and values['-PSSH-'] == '' and values['-OPTIONS-'] == 'Generic':
+                window['-OUTPUT-'].update(f"No PSSH provided")
+
+            # Error for no PSSH or License URL - Generic
+            if values['-PSSH-'] == '' and values['-LIC_URL-'] == '' and values['-OPTIONS-'] == 'Generic':
+                window['-OUTPUT-'].update(f"No PSSH or License URL provided")
+
+            # Action for Decrypt for Crunchyroll decrypt if fields are filled out
             if values['-PSSH-'] != '' and values['-OPTIONS-'] == 'Crunchyroll' and values['-HEADERS-'] != '':
                 if not values['-USE_API-']:
                     try:
@@ -115,12 +121,15 @@ def start_gui(wvd: str = None, api_key: str = None):
                     except Exception as error:
                         window['-OUTPUT-'].update(f"{error}")
 
+            # Error for no Headers - Generic
             if values['-PSSH-'] != '' and values['-OPTIONS-'] == 'Crunchyroll' and values['-HEADERS-'] == '':
                 window['-OUTPUT-'].update(f"No Headers provided")
 
+            # Error for no PSSH
             if values['-PSSH-'] == '' and values['-OPTIONS-'] == 'Crunchyroll':
                 window['-OUTPUT-'].update(f"No PSSH provided")
 
+            # Action for Decrypt for YouTube decrypt if fields are filled out
             if values['-LIC_URL-'] != '' and values['-OPTIONS-'] == 'YouTube' and values['-HEADERS-'] != '' and values['-JSON-'] != '' and values['-COOKIES-'] != '':
                 if not values['-USE_API-']:
                     try:
@@ -141,45 +150,82 @@ def start_gui(wvd: str = None, api_key: str = None):
                     except Exception as error:
                         window['-OUTPUT-'].update(f"{error}")
 
+            # Error for no Headers - Crunchyroll
             if values['-LIC_URL-'] != '' and values['-OPTIONS-'] == 'YouTube' and values['-HEADERS-'] == '' and values['-JSON-'] != '' and values['-COOKIES-'] != '':
                 window['-OUTPUT-'].update(f"No Headers provided")
 
+            # Error for no Headers or JSON - Crunchyroll
+            if values['-LIC_URL-'] != '' and values['-OPTIONS-'] == 'YouTube' and values['-HEADERS-'] == '' and values['-JSON-'] == '' and values['-COOKIES-'] != '':
+                window['-OUTPUT-'].update(f"No Headers or JSON provided")
+
+            # Error for no Headers or Cookies - Crunchyroll
+            if values['-LIC_URL-'] != '' and values['-OPTIONS-'] == 'YouTube' and values['-HEADERS-'] == '' and values['-JSON-'] != '' and values['-COOKIES-'] == '':
+                window['-OUTPUT-'].update(f"No Headers or Cookies provided")
+
+            # Error for no JSON - Crunchyroll
             if values['-LIC_URL-'] != '' and values['-OPTIONS-'] == 'YouTube' and values['-JSON-'] == '' and values['-HEADERS-'] != '' and values['-COOKIES-'] != '':
                 window['-OUTPUT-'].update(f"No JSON provided")
 
+            # Error for no JSON or Headers - Crunchyroll
+            if values['-LIC_URL-'] != '' and values['-OPTIONS-'] == 'YouTube' and values['-JSON-'] == '' and values['-HEADERS-'] == '' and values['-COOKIES-'] != '':
+                window['-OUTPUT-'].update(f"No JSON or Headers provided")
+
+            # Error for no JSON or Cookies - Crunchyroll
+            if values['-LIC_URL-'] != '' and values['-OPTIONS-'] == 'YouTube' and values['-JSON-'] == '' and values['-HEADERS-'] != '' and values['-COOKIES-'] == '':
+                window['-OUTPUT-'].update(f"No JSON or Cookies provided")
+
+            # Error for no Cookies - Crunchyroll
             if values['-LIC_URL-'] != '' and values['-OPTIONS-'] == 'YouTube' and values['-COOKIES-'] == '' and values['-HEADERS-'] != '' and values['-JSON-'] != '':
                 window['-OUTPUT-'].update(f"No Cookies provided")
 
-            if values['-LIC_URL-'] != '' and values['-OPTIONS-'] == 'YouTube' and values['-HEADERS-'] == '' and values['-JSON-'] == '' and values['-COOKIES-'] == '':
-                window['-OUTPUT-'].update(f"All fields empty!")
+            # Error for no Cookies or Headers - Crunchyroll
+            if values['-LIC_URL-'] != '' and values['-OPTIONS-'] == 'YouTube' and values['-COOKIES-'] == '' and values['-HEADERS-'] == '' and values['-JSON-'] != '':
+                window['-OUTPUT-'].update(f"No Cookies or Headers provided")
 
+            # Error for no Cookies or JSON - Crunchyroll
+            if values['-LIC_URL-'] != '' and values['-OPTIONS-'] == 'YouTube' and values['-COOKIES-'] == '' and values['-HEADERS-'] != '' and values['-JSON-'] == '':
+                window['-OUTPUT-'].update(f"No Cookies or JSON provided")
+
+            # Error if Headers, Cookies and JSON are empty - Crunchyroll
+            if values['-LIC_URL-'] != '' and values['-OPTIONS-'] == 'YouTube' and values['-HEADERS-'] == '' and values['-JSON-'] == '' and values['-COOKIES-'] == '':
+                window['-OUTPUT-'].update(f"No dictionaries provided")
+
+            # Error if no license URL - Crunchyroll
             if values['-LIC_URL-'] == '' and values['-OPTIONS-'] == 'YouTube':
                 window['-OUTPUT-'].update(f"No license URL provided")
 
-
+        # Actions for reset button
         if event == 'Reset':
             window['-PSSH-'].update(value="", disabled=False)
             window['-LIC_URL-'].update(value="", disabled=False)
             window['-OUTPUT-'].update(value="", disabled=False)
             window['-HEADERS-'].update(value="", disabled=False)
             window['-OPTIONS-'].update(value="Generic", disabled=False)
+            window['-JSON-'].update(visible=False)
+            window['-JSON_TEXT-'].update(visible=False)
+            window['-COOKIES-'].update(visible=False)
+            window['-COOKIES_TEXT-'].update(visible=False)
 
+
+        # Actions for Crunchyroll selector
         if event == '-OPTIONS-' and values['-OPTIONS-'] == 'Crunchyroll':
             window['-PSSH-'].update(value="", disabled=False)
             window['-LIC_URL-'].update(value="", disabled=True)
-            window['-JSON-'].update(visible=False)
+            window['-JSON-'].update(value="", visible=False)
             window['-JSON_TEXT-'].update(visible=False)
-            window['-COOKIES-'].update(visible=False)
+            window['-COOKIES-'].update(value="", visible=False)
             window['-COOKIES_TEXT-'].update(visible=False)
 
+        # Actions for Generic selector
         if event == '-OPTIONS-' and values['-OPTIONS-'] == 'Generic':
             window['-PSSH-'].update(value="", disabled=False)
             window['-LIC_URL-'].update(value="", disabled=False)
-            window['-JSON-'].update(visible=False)
+            window['-JSON-'].update(value="", visible=False)
             window['-JSON_TEXT-'].update(visible=False)
-            window['-COOKIES-'].update(visible=False)
+            window['-COOKIES-'].update(value="", visible=False)
             window['-COOKIES_TEXT-'].update(visible=False)
 
+        # Actions for YouTube selector
         if event == '-OPTIONS-' and values['-OPTIONS-'] == 'YouTube':
             window['-PSSH-'].update(value="", disabled=True)
             window['-LIC_URL-'].update(value="", disabled=False)
