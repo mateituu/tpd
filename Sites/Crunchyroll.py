@@ -7,7 +7,7 @@ import requests
 import base64
 import os
 import Helpers
-
+from sys import exit
 
 # Defining decrypt function for Crunchyroll
 def decrypt_crunchyroll(wvd: str = None, license_curl_headers: dict = None, mpd_url: str = None,

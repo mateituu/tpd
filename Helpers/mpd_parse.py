@@ -1,5 +1,6 @@
 import requests
 import re
+from sys import exit
 
 
 # Define MPD / m3u8 PSSH parser

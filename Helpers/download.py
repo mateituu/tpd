@@ -6,6 +6,7 @@ import Helpers.binary_check
 import Sites.Generic
 import license_curl
 import Helpers.os_check
+from sys import exit
 
 
 # Web Download function generic

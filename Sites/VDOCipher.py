@@ -9,6 +9,7 @@ import base64
 import os
 import Helpers
 import re
+from sys import exit
 
 
 # Defining decrypt function for generic services

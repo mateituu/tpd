@@ -2,6 +2,7 @@
 
 import os
 import sqlite3
+from sys import exit
 
 
 # Check to see if the database already exists, if not create a keys folder, and create the database.

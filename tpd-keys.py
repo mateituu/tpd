@@ -3,6 +3,7 @@ import Helpers
 import Sites
 import license_curl
 import argparse
+from sys import exit
 
 # Get device and api key
 device, api_key = Helpers.capability_check.capability_check()

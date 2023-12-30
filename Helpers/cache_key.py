@@ -2,6 +2,7 @@
 
 import sqlite3
 import os
+from sys import exit
 
 
 # Define cache function

@@ -7,6 +7,7 @@ import requests
 import base64
 import os
 import Helpers
+from sys import exit
 
 
 # Defining decrypt function for generic services

@@ -7,6 +7,7 @@ import tarfile
 import stat
 from Helpers import os_check
 from tqdm import tqdm
+from sys import exit
 
 
 # Create / Check folders function

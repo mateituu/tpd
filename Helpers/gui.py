@@ -1,6 +1,7 @@
 import PySimpleGUI as sg
 import Sites
 import ast
+from sys import exit
 
 
 def clean_dict(dict: str = None):
@@ -20,8 +21,10 @@ def start_gui(wvd: str = None, api_key: str = None):
     left_frame_normal = sg.Col([
               [sg.Text('PSSH:'), sg.Text(size=(15, 1), key='-PSSH_TEXT-', expand_x=True, expand_y=True)],
               [sg.Input(key="-PSSH-")],
+              [sg.VPush()],
               [sg.Text(text='License URL:'), sg.Text(size=(15, 1), key='-LIC_URL_TEXT-', expand_x=True, expand_y=True)],
               [sg.Input(key='-LIC_URL-')],
+              [sg.VPush()],
               [sg.Text('Keys:')],
               [sg.Output(size=(45, 6), key='-OUTPUT-', expand_y=True, expand_x=True)],
               [sg.Button('Decrypt'), sg.Button('Reset')]
@@ -42,7 +45,7 @@ def start_gui(wvd: str = None, api_key: str = None):
     ]
 
     # the window
-    window = sg.Window('TPD-Keys', layout=window_layout, resizable=True)
+    window = sg.Window('TPD-Keys', layout=window_layout, resizable=True, size=(800, 800))
 
     # the event loop
     while True:
@@ -66,12 +69,15 @@ def start_gui(wvd: str = None, api_key: str = None):
                         except Exception as error:
                             window['-OUTPUT-'].update(f"{error}")
                     if values['-USE_API-']:
-                        try:
-                            _, key_out = Sites.Generic.decrypt_generic_remotely(api_key=api_key, in_pssh=values['-PSSH-'],
-                                                              in_license_url=values['-LIC_URL-'])
-                            window['-OUTPUT-'].update(f"{key_out}")
-                        except Exception as error:
-                            window['-OUTPUT-'].update(f"{error}")
+                        if api_key is None:
+                            window['-OUTPUT-'].update(f"No API key")
+                        if api_key is not None:
+                            try:
+                                _, key_out = Sites.Generic.decrypt_generic_remotely(api_key=api_key, in_pssh=values['-PSSH-'],
+                                                                  in_license_url=values['-LIC_URL-'])
+                                window['-OUTPUT-'].update(f"{key_out}")
+                            except Exception as error:
+                                window['-OUTPUT-'].update(f"{error}")
 
                 if values['-HEADERS-'] != '':
                     if not values['-USE_API-']:
@@ -83,14 +89,17 @@ def start_gui(wvd: str = None, api_key: str = None):
                         except Exception as error:
                             window['-OUTPUT-'].update(f"{error}")
                     if values['-USE_API-']:
-                        try:
-                            _, key_out = Sites.Generic.decrypt_generic_remotely(api_key=api_key,
-                                                                                in_pssh=values['-PSSH-'],
-                                                                                in_license_url=values['-LIC_URL-'],
-                                                                                license_curl_headers=ast.literal_eval(clean_dict(dict=values['-HEADERS-'])))
-                            window['-OUTPUT-'].update(f"{key_out}")
-                        except Exception as error:
-                            window['-OUTPUT-'].update(f"{error}")
+                        if api_key is None:
+                            window['-OUTPUT-'].update(f"No API key")
+                        if api_key is not None:
+                            try:
+                                _, key_out = Sites.Generic.decrypt_generic_remotely(api_key=api_key,
+                                                                                    in_pssh=values['-PSSH-'],
+                                                                                    in_license_url=values['-LIC_URL-'],
+                                                                                    license_curl_headers=ast.literal_eval(clean_dict(dict=values['-HEADERS-'])))
+                                window['-OUTPUT-'].update(f"{key_out}")
+                            except Exception as error:
+                                window['-OUTPUT-'].update(f"{error}")
 
             # Error for no license URL - Generic
             if values['-PSSH-'] != '' and values['-LIC_URL-'] == '' and values['-OPTIONS-'] == 'Generic':
@@ -114,12 +123,15 @@ def start_gui(wvd: str = None, api_key: str = None):
                     except Exception as error:
                         window['-OUTPUT-'].update(f"{error}")
                 if values['-USE_API-']:
-                    try:
-                        _, key_out = Sites.Crunchyroll.decrypt_crunchyroll_remotely(api_key=api_key, in_pssh=values['-PSSH-'],
+                    if api_key is None:
+                        window['-OUTPUT-'].update(f"No API key")
+                    if api_key is not None:
+                        try:
+                            _, key_out = Sites.Crunchyroll.decrypt_crunchyroll_remotely(api_key=api_key, in_pssh=values['-PSSH-'],
                                                                            license_curl_headers=ast.literal_eval(clean_dict(dict=values['-HEADERS-'])))
-                        window['-OUTPUT-'].update(f"{key_out}")
-                    except Exception as error:
-                        window['-OUTPUT-'].update(f"{error}")
+                            window['-OUTPUT-'].update(f"{key_out}")
+                        except Exception as error:
+                            window['-OUTPUT-'].update(f"{error}")
 
             # Error for no Headers - Generic
             if values['-PSSH-'] != '' and values['-OPTIONS-'] == 'Crunchyroll' and values['-HEADERS-'] == '':
@@ -141,14 +153,17 @@ def start_gui(wvd: str = None, api_key: str = None):
                     except Exception as error:
                         window['-OUTPUT-'].update(f"{error}")
                 if values['-USE_API-']:
-                    try:
-                        _, key_out = Sites.YouTube.decrypt_youtube_remotely(api_key=api_key, in_license_url=values['-LIC_URL-'],
-                                                                   license_curl_headers=ast.literal_eval(clean_dict(dict=values['-HEADERS-'])),
-                                                                   license_curl_json=ast.literal_eval(clean_dict(dict=values['-JSON-'])),
-                                                                   license_curl_cookies=ast.literal_eval(clean_dict(dict=values['-COOKIES-'])))
-                        window['-OUTPUT-'].update(f"{key_out}")
-                    except Exception as error:
-                        window['-OUTPUT-'].update(f"{error}")
+                    if api_key is None:
+                        window['-OUTPUT-'].update(f"No API key")
+                    if api_key is not None:
+                        try:
+                            _, key_out = Sites.YouTube.decrypt_youtube_remotely(api_key=api_key, in_license_url=values['-LIC_URL-'],
+                                                                       license_curl_headers=ast.literal_eval(clean_dict(dict=values['-HEADERS-'])),
+                                                                       license_curl_json=ast.literal_eval(clean_dict(dict=values['-JSON-'])),
+                                                                       license_curl_cookies=ast.literal_eval(clean_dict(dict=values['-COOKIES-'])))
+                            window['-OUTPUT-'].update(f"{key_out}")
+                        except Exception as error:
+                            window['-OUTPUT-'].update(f"{error}")
 
             # Error for no Headers - Crunchyroll
             if values['-LIC_URL-'] != '' and values['-OPTIONS-'] == 'YouTube' and values['-HEADERS-'] == '' and values['-JSON-'] != '' and values['-COOKIES-'] != '':
