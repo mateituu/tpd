@@ -10,7 +10,9 @@ def capability_check():
     if Device is None:
         API_Key = Helpers.api_check.api_check()
         if API_Key == "First run" or API_Key == None:
-            exit(f"No CDM or API key found, please place a CDM in {os.getcwd()}/WVDs or an API key in {os.getcwd()}/Config/api-key.txt")
+            print(f"No CDM or API key found, please place a CDM in {os.getcwd()}/WVDs or an API key in {os.getcwd()}/Config/api-key.txt")
+            return None, None
+
         else:
             print("No local device found, remote decryption only.")
             print(f'Using API Key: {API_Key}\n')

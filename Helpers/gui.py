@@ -1,7 +1,7 @@
 import PySimpleGUI as sg
 import Sites
 import ast
-from sys import exit
+import webbrowser
 
 
 def clean_dict(dict: str = None):
@@ -14,6 +14,7 @@ def clean_dict(dict: str = None):
 
 
 def start_gui(wvd: str = None, api_key: str = None):
+
 
     sg.theme('Dark Amber')    # Add theme
 
@@ -30,17 +31,28 @@ def start_gui(wvd: str = None, api_key: str = None):
               [sg.Button('Decrypt'), sg.Button('Reset')]
         ], expand_x=True, expand_y=True)
 
-    right_frame_normal = sg.Col([
-        [sg.Text('Headers:')],
+    right_frame = [
+        [sg.Text('headers =')],
         [sg.Multiline(key='-HEADERS-', size=(50, 10), expand_x=True, expand_y=True)],
-        [sg.Text('JSON:', key='-JSON_TEXT-', visible=False)],
+        [sg.Text('json =', key='-JSON_TEXT-', visible=False)],
         [sg.Multiline(key='-JSON-', size=(50, 10), visible=False, expand_x=True, expand_y=True)],
-        [sg.Text('Cookies:', key='-COOKIES_TEXT-', visible=False)],
+        [sg.Text('cookies =', key='-COOKIES_TEXT-', visible=False)],
         [sg.Multiline(key='-COOKIES-', size=(50, 10), visible=False, expand_x=True, expand_y=True)],
-        [sg.Combo(values=['Generic', 'Crunchyroll', 'YouTube'], default_value='Generic', key='-OPTIONS-', enable_events=True), sg.Push(), sg.Checkbox(text="Use CDM-Project API", key='-USE_API-')]
-    ], expand_x=True, expand_y=True)
+        [sg.Combo(values=['Generic', 'Crunchyroll', 'YouTube'], default_value='Generic', key='-OPTIONS-',
+                  enable_events=True), sg.Push(), sg.Checkbox(text="Use CDM-Project API", key='-USE_API-')]
+    ]
+
+    if wvd is None:
+        right_frame[6] = [sg.Combo(values=['Generic', 'Crunchyroll', 'YouTube'], default_value='Generic', key='-OPTIONS-',
+                  enable_events=True), sg.Push(), sg.Checkbox(text="Use CDM-Project API", key='-USE_API-', default=True, disabled=True)]
+    if api_key is None:
+        right_frame[6] = [sg.Combo(values=['Generic', 'Crunchyroll', 'YouTube'], default_value='Generic', key='-OPTIONS-',
+                     enable_events=True), sg.Push(), sg.Checkbox(text="Use CDM-Project API", key='-USE_API-', default=False, disabled=True)]
+
+    right_frame_normal = sg.Col(right_frame, expand_x=True, expand_y=True)
 
     window_layout = [
+        [sg.MenubarCustom([['About', ['Discord', 'CDM-Project', 'CDRM-Project', 'Source Code', 'Version']]],  k='-MENUBAR-', p=0, )],
         [left_frame_normal, right_frame_normal]
     ]
 
@@ -49,6 +61,9 @@ def start_gui(wvd: str = None, api_key: str = None):
 
     # the event loop
     while True:
+        if wvd is None and api_key is None:
+            sg.popup(title="TPD-Keys", custom_text="No CDM or API key found!")
+            break
 
         event, values = window.read()
 
@@ -221,7 +236,6 @@ def start_gui(wvd: str = None, api_key: str = None):
             window['-COOKIES-'].update(visible=False)
             window['-COOKIES_TEXT-'].update(visible=False)
 
-
         # Actions for Crunchyroll selector
         if event == '-OPTIONS-' and values['-OPTIONS-'] == 'Crunchyroll':
             window['-PSSH-'].update(value="", disabled=False)
@@ -249,8 +263,17 @@ def start_gui(wvd: str = None, api_key: str = None):
             window['-COOKIES-'].update(visible=True)
             window['-COOKIES_TEXT-'].update(visible=True)
 
-
-
+        # Actions for MenuBar
+        if event == 'Discord':
+            webbrowser.open(url='https://discord.gg/cdrm-project')
+        if event == 'CDM-Project':
+            webbrowser.open(url='https://cdm-project.com')
+        if event == 'CDRM-Project':
+            webbrowser.open(url='https://cdrm-project.com')
+        if event == 'Source Code':
+            webbrowser.open(url='https://cdm-project.com/Decryption-Tools/TPD-Keys')
+        if event == 'Version':
+            sg.popup('Version 1.22', custom_text='Close', grab_anywhere=True)
 
     # 4 - the close
     window.close()
