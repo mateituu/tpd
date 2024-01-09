@@ -45,11 +45,11 @@ def start_gui(wvd: str = None, api_key: str = None):
                   enable_events=True), sg.Push(), sg.Checkbox(text="Use CDM-Project API", key='-USE_API-')]
     ]
 
-    if wvd is None:
-        right_frame[6] = [sg.Combo(values=['Generic', 'Crunchyroll', 'YouTube', 'RTE'], default_value='Generic', key='-OPTIONS-',
+    if wvd is None and api_key is not None:
+        right_frame[8] = [sg.Combo(values=['Generic', 'Crunchyroll', 'YouTube', 'RTE'], default_value='Generic', key='-OPTIONS-',
                   enable_events=True), sg.Push(), sg.Checkbox(text="Use CDM-Project API", key='-USE_API-', default=True, disabled=True)]
-    if api_key is None:
-        right_frame[6] = [sg.Combo(values=['Generic', 'Crunchyroll', 'YouTube', 'RTE'], default_value='Generic', key='-OPTIONS-',
+    if api_key is None and wvd is not None:
+        right_frame[8] = [sg.Combo(values=['Generic', 'Crunchyroll', 'YouTube', 'RTE'], default_value='Generic', key='-OPTIONS-',
                      enable_events=True), sg.Push(), sg.Checkbox(text="Use CDM-Project API", key='-USE_API-', default=False, disabled=True)]
 
     right_frame_normal = sg.Col(right_frame, expand_x=True, expand_y=True)
