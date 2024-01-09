@@ -314,7 +314,7 @@ def start_gui(wvd: str = None, api_key: str = None):
         if event == 'Source Code':
             webbrowser.open(url='https://cdm-project.com/Decryption-Tools/TPD-Keys')
         if event == 'Version':
-            sg.popup('Version 1.22', custom_text='Close', grab_anywhere=True)
+            sg.popup('Version 1.3', custom_text='Close', grab_anywhere=True)
 
     # 4 - the close
     window.close()
