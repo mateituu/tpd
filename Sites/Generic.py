@@ -31,12 +31,19 @@ def decrypt_generic(wvd: str = None, license_curl_headers: dict = None, mpd_url:
         # Ask for PSSH if web-dl not selected:
         input_pssh = input(f"\nPSSH: ")
 
-
     # prepare pssh
     if in_pssh is None:
-        pssh = PSSH(input_pssh)
+        try:
+            pssh = PSSH(input_pssh)
+        except Exception as error:
+            print(f'an error occurred!\n{error}')
+            return None, error
     if in_pssh is not None:
-        pssh = PSSH(in_pssh)
+        try:
+            pssh = PSSH(in_pssh)
+        except Exception as error:
+            print(f'an error occurred!\n{error}')
+            return None, error
 
     # Ask for license URL
     if in_license_url is None:
@@ -60,10 +67,15 @@ def decrypt_generic(wvd: str = None, license_curl_headers: dict = None, mpd_url:
         headers=license_curl_headers
     )
     if service_cert.status_code != 200:
-        print("Couldn't retrieve service cert")
+        print(f"Couldn't retrieve service cert\n{service_cert.content}")
+        return None, service_cert.content
     else:
-        service_cert = service_cert.content
-        cdm.set_service_certificate(session_id, service_cert)
+        try:
+            service_cert = service_cert.content
+            cdm.set_service_certificate(session_id, service_cert)
+        except Exception as error:
+            print(f'an error occurred!\n{error}')
+            return None, error
 
     # generate license challenge
     if service_cert:
@@ -79,14 +91,18 @@ def decrypt_generic(wvd: str = None, license_curl_headers: dict = None, mpd_url:
     )
 
     if license.status_code != 200:
-        print(license.content)
-        exit("Could not complete license challenge")
+        print(f'An error occurred!\n{license.content}')
+        return license.content
 
-    # Extract license from json dict
+    # Extract license from content
     license = license.content
 
     # parse license challenge
-    cdm.parse_license(session_id, license)
+    try:
+        cdm.parse_license(session_id, license)
+    except Exception as error:
+        print(f'an error occurred!\n{error}')
+        return None, error
 
     # assign variable for returned keys
     returned_keys = ""
@@ -161,6 +177,11 @@ def decrypt_generic_remotely(api_key: str = None, license_curl_headers: dict = N
     # Open CDM session
     open_session = requests.get(url=f'{api_url}/{api_device}/open', headers=api_key_headers)
 
+    # Error handling
+    if open_session.status_code != 200:
+        print(f"An error occurred!\n{open_session.content}")
+        return None, open_session.content
+
     # Get the session ID from the open CDM session
     session_id = open_session.json()["data"]["session_id"]
 
@@ -173,6 +194,11 @@ def decrypt_generic_remotely(api_key: str = None, license_curl_headers: dict = N
     # Generate the license challenge
     generate_challenge = requests.post(url=f'{api_url}/{api_device}/get_license_challenge/AUTOMATIC', headers=api_key_headers, json=generate_challenge_json)
 
+    # Error handling
+    if generate_challenge.status_code != 200:
+        print(f"An error occurred!\n{generate_challenge.content}")
+        return None, generate_challenge.content
+
     # Retrieve the challenge and base64 decode it
     challenge = base64.b64decode(generate_challenge.json()["data"]["challenge_b64"])
 
@@ -182,6 +208,10 @@ def decrypt_generic_remotely(api_key: str = None, license_curl_headers: dict = N
         headers=license_curl_headers,
         data=challenge
     )
+
+    if license.status_code != 200:
+        print(f'An error occurred!\n{license.content}')
+        return None, license.content
 
     # Retrieve the license message
     license = base64.b64encode(license.content).decode()
@@ -193,12 +223,22 @@ def decrypt_generic_remotely(api_key: str = None, license_curl_headers: dict = N
     }
 
     # Parse the license
-    requests.post(url=f'{api_url}/{api_device}/parse_license', headers=api_key_headers, json=license_message_json)
+    parse = requests.post(url=f'{api_url}/{api_device}/parse_license', headers=api_key_headers, json=license_message_json)
+
+    # Error handling
+    if parse.status_code != 200:
+        print(f"An error occurred!\n{parse.content}")
+        return None, parse.content
 
     # Retrieve the keys
     get_keys = requests.post(url=f'{api_url}/{api_device}/get_keys/ALL',
                              json={"session_id": session_id},
                              headers=api_key_headers)
+
+    # Error handling
+    if get_keys.status_code != 200:
+        print(f"An error occurred!\n{get_keys.content}")
+        return None, get_keys.content
 
     # Iterate through the keys, ignoring signing key
     returned_keys = ''

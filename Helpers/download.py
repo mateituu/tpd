@@ -6,11 +6,10 @@ import Helpers.binary_check
 import Sites.Generic
 import license_curl
 import Helpers.os_check
-from sys import exit
 
 
 # Web Download function generic
-def web_dl_generic(mpd: str = None, device: str = None, api_key: str = None, remote: bool = False):
+def web_dl_generic(mpd: str = None, device: str = None, api_key: str = None, remote: bool = False, site: str = None):
 
     # Get the current operating system
     operating_system = Helpers.os_check.get_os_specific()
@@ -26,9 +25,15 @@ def web_dl_generic(mpd: str = None, device: str = None, api_key: str = None, rem
 
     # Retrieve the keys
     if not remote:
-        mp4decrypt_keys, _ = Sites.Generic.decrypt_generic(mpd_url=mpd, wvd=device, license_curl_headers=license_curl.headers)
+        if not site:
+            mp4decrypt_keys, _ = Sites.Generic.decrypt_generic(mpd_url=mpd, wvd=device, license_curl_headers=license_curl.headers)
+        if site == 'rte':
+            mp4decrypt_keys, _ = Sites.RTE.decrypt_rte(mpd_url=mpd, wvd=device, license_curl_headers=license_curl.headers)
     if remote:
-        mp4decrypt_keys, _ = Sites.Generic.decrypt_generic_remotely(api_key=api_key, license_curl_headers=license_curl.headers, mpd_url=mpd)
+        if not site:
+            mp4decrypt_keys, _ = Sites.Generic.decrypt_generic_remotely(api_key=api_key, license_curl_headers=license_curl.headers, mpd_url=mpd)
+        if site == 'rte':
+            mp4decrypt_keys, _ = Sites.RTE.decrypt_rte_remotely(mpd_url=mpd, api_key=api_key, license_curl_headers=license_curl.headers)
 
     # Define n_m3u8dl-re download parameters
     n_m3u8dl_re_download = [

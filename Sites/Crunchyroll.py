@@ -9,6 +9,7 @@ import os
 import Helpers
 from sys import exit
 
+
 # Defining decrypt function for Crunchyroll
 def decrypt_crunchyroll(wvd: str = None, license_curl_headers: dict = None, mpd_url: str = None,
                         in_pssh: str = None):
@@ -32,9 +33,17 @@ def decrypt_crunchyroll(wvd: str = None, license_curl_headers: dict = None, mpd_
 
     # prepare pssh
     if in_pssh is None:
-        pssh = PSSH(input_pssh)
+        try:
+            pssh = PSSH(input_pssh)
+        except Exception as error:
+            print(f"An error occurred!\n{error}")
+            return None, error
     if in_pssh is not None:
-        pssh = PSSH(in_pssh)
+        try:
+            pssh = PSSH(in_pssh)
+        except Exception as error:
+            print(f"An error occurred!\n{error}")
+            return None, error
 
     # load device
     device = Device.load(wvd)
@@ -52,7 +61,8 @@ def decrypt_crunchyroll(wvd: str = None, license_curl_headers: dict = None, mpd_
         headers=license_curl_headers
     )
     if service_cert.status_code != 200:
-        print("Couldn't retrieve service cert")
+        print(f"Couldn't retrieve service cert\n{service_cert.content}")
+        return None, service_cert.content
     else:
         service_cert = service_cert.json()["license"]
         cdm.set_service_certificate(session_id, service_cert)
@@ -71,8 +81,8 @@ def decrypt_crunchyroll(wvd: str = None, license_curl_headers: dict = None, mpd_
     )
 
     if license.status_code != 200:
-        print(license.content)
-        exit("Could not complete license challenge")
+        print(f"An error occurred!\n{license.content}")
+        return None, license.content
 
     # Extract license from json dict
     license = license.json()["license"]
@@ -147,6 +157,11 @@ def decrypt_crunchyroll_remotely(api_key: str = None, license_curl_headers: dict
     # Open CDM session
     open_session = requests.get(url=f'{api_url}/{api_device}/open', headers=api_key_headers)
 
+    # Error  handling
+    if open_session.status_code != 200:
+        print(f"An error occurred!\n{open_session.content}")
+        return None, open_session.content
+
     # Get the session ID from the open CDM session
     session_id = open_session.json()["data"]["session_id"]
 
@@ -159,6 +174,11 @@ def decrypt_crunchyroll_remotely(api_key: str = None, license_curl_headers: dict
     # Generate the license challenge
     generate_challenge = requests.post(url=f'{api_url}/{api_device}/get_license_challenge/AUTOMATIC', headers=api_key_headers, json=generate_challenge_json)
 
+    # Error  handling
+    if generate_challenge.status_code != 200:
+        print(f"An error occurred!\n{generate_challenge.content}")
+        return None, generate_challenge.content
+
     # Retrieve the challenge and base64 decode it
     challenge = base64.b64decode(generate_challenge.json()["data"]["challenge_b64"])
 
@@ -168,6 +188,9 @@ def decrypt_crunchyroll_remotely(api_key: str = None, license_curl_headers: dict
         headers=license_curl_headers,
         data=challenge
     )
+
+    if license.status_code != 200:
+        print(f"An error occurred!\n{license.content}")
 
     # Retrieve the license message
     license = license.json()["license"]
@@ -179,12 +202,20 @@ def decrypt_crunchyroll_remotely(api_key: str = None, license_curl_headers: dict
     }
 
     # Parse the license
-    requests.post(url=f'{api_url}/{api_device}/parse_license', headers=api_key_headers, json=license_message_json)
+    parse = requests.post(url=f'{api_url}/{api_device}/parse_license', headers=api_key_headers, json=license_message_json)
+
+    # Error handling
+    if parse.status_code != 200:
+        print(f"An error occurred!\n{parse.content}")
 
     # Retrieve the keys
     get_keys = requests.post(url=f'{api_url}/{api_device}/get_keys/ALL',
                              json={"session_id": session_id},
                              headers=api_key_headers)
+
+    # Error handling
+    if get_keys.status_code != 200:
+        print(f"An error occurred!\n{get_keys.content}")
 
     # Iterate through the keys, ignoring signing key
     returned_keys = ''
@@ -206,7 +237,11 @@ def decrypt_crunchyroll_remotely(api_key: str = None, license_curl_headers: dict
     print(f'\nKeys:\n{returned_keys}')
 
     # Close session
-    requests.get(url=f'{api_url}/{api_device}/close/{session_id}', headers=api_key_headers)
+    close_session = requests.get(url=f'{api_url}/{api_device}/close/{session_id}', headers=api_key_headers)
+
+    # Error handling
+    if close_session.status_code != 200:
+        print(f"An error occurred!\n{close_session.content}")
 
     # return mp4decrypt keys
     return mp4decrypt_keys, returned_keys
