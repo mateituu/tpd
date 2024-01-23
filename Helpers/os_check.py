@@ -1,5 +1,4 @@
 import os
-from sys import exit
 
 
 def get_os_specific():

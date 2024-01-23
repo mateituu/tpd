@@ -21,8 +21,11 @@ services.add_argument('--crunchyroll', action='store_true', help="Decrypt Crunch
 services.add_argument('--crunchyroll-remote', action='store_true', help="Decrypt Crunchyroll remotely")
 services.add_argument('--generic', action='store_true', help="Decrypt generic services")
 services.add_argument('--generic-remote', action='store_true', help="Decrypt generic services remotely")
+services.add_argument('--pssh', action='store_true', help="Parse a PSSH from an MPD link.")
 services.add_argument('--rte', action='store_true', help="Decrypt RTE")
 services.add_argument('--rte-remote', action='store_true', help="Decrypt RTE remotely")
+services.add_argument('--udemy', action='store_true', help="Decrypt Udemy")
+services.add_argument('--udemy-remote', action='store_true', help="Decrypt Udemy remotely")
 services.add_argument('--youtube', action='store_true', help="Decrypt YouTube")
 services.add_argument('--youtube-remote', action='store_true', help="Decrypt YouTube remotely")
 
@@ -72,9 +75,14 @@ elif switches.generic_remote:
     else:
         Sites.Generic.decrypt_generic_remotely(api_key=api_key, license_curl_headers=license_curl.headers)
 
+elif switches.pssh:
+    # Perform action for --pssh
+    mpd = input("MPD URL: ")
+    print(f'PSSH: {Helpers.mpd_parse.parse_pssh(manifest_url=mpd)}')
+
 
 elif switches.rte:
-    # Perform action for --rte , perform a default action
+    # Perform action for --rte
     if switches.web_dl:
         mpd = input("MPD URL: ")
         file = Helpers.download.web_dl_generic(mpd=mpd, device=device, site='rte')
@@ -91,6 +99,25 @@ elif switches.rte_remote:
         print(f'Saved at {file[0]}')
     else:
         Sites.RTE.decrypt_rte_remotely(api_key=api_key)
+
+elif switches.udemy:
+    # Perform action for --udemy
+    if switches.web_dl:
+        mpd = input("MPD URL: ")
+        file = Helpers.download.web_dl_generic(mpd=mpd, device=device, site='udemy')
+        print(f'Saved at {file[0]}')
+    else:
+        Sites.Udemy.decrypt_udemy(wvd=device, license_curl_headers=license_curl.headers, license_curl_cookies=license_curl.cookies)
+
+
+elif switches.udemy_remote:
+    # Perform action for --udemy-remote
+    if switches.web_dl:
+        mpd = input("MPD URL: ")
+        file = Helpers.download.web_dl_generic(mpd=mpd, api_key=api_key, remote=True, site='udemy')
+        print(f'Saved at {file[0]}')
+    else:
+        Sites.Udemy.decrypt_udemy_remotely(api_key=api_key, license_curl_headers=license_curl.headers, license_curl_cookies=license_curl.cookies)
 
 
 elif switches.youtube:

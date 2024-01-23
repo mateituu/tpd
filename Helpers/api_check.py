@@ -1,6 +1,5 @@
 # Import dependencies
 import os
-from sys import exit
 
 
 # Define api key check

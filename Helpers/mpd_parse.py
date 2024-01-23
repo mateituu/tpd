@@ -4,10 +4,10 @@ from sys import exit
 
 
 # Define MPD / m3u8 PSSH parser
-def parse_pssh(manifest_url):
+def parse_pssh(manifest_url, license_headers: dict = None):
     manifest = manifest_url
     try:
-        response = requests.get(manifest)
+        response = requests.get(manifest, headers=license_headers)
     except:
         pssh = input("Couldn't retrieve manifest, please input PSSH: ")
         return pssh

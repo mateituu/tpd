@@ -29,11 +29,15 @@ def web_dl_generic(mpd: str = None, device: str = None, api_key: str = None, rem
             mp4decrypt_keys, _ = Sites.Generic.decrypt_generic(mpd_url=mpd, wvd=device, license_curl_headers=license_curl.headers)
         if site == 'rte':
             mp4decrypt_keys, _ = Sites.RTE.decrypt_rte(mpd_url=mpd, wvd=device, license_curl_headers=license_curl.headers)
+        if site == 'udemy':
+            mp4decrypt_keys, _ = Sites.Udemy.decrypt_udemy(mpd_url=mpd, wvd=device, license_curl_headers=license_curl.headers, license_curl_cookies=license_curl.cookies)
     if remote:
         if not site:
             mp4decrypt_keys, _ = Sites.Generic.decrypt_generic_remotely(api_key=api_key, license_curl_headers=license_curl.headers, mpd_url=mpd)
         if site == 'rte':
             mp4decrypt_keys, _ = Sites.RTE.decrypt_rte_remotely(mpd_url=mpd, api_key=api_key, license_curl_headers=license_curl.headers)
+        if site == 'udemy':
+            mp4decrypt_keys, _ = Sites.Udemy.decrypt_udemy_remotely(mpd_url=mpd, api_key=api_key, license_curl_headers=license_curl.headers, license_curl_cookies=license_curl.cookies)
 
     # Define n_m3u8dl-re download parameters
     n_m3u8dl_re_download = [
