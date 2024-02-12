@@ -240,7 +240,7 @@ def start_gui(wvd: str = None, api_key: str = None):
             if values['-PSSH-'] != '' and values['-OPTIONS-'] == 'Udemy' and values['-LIC_URL-'] != '' and values['-HEADERS-'] != '' and values['-COOKIES-'] != '':
                 if not values['-USE_API-']:
                     try:
-                        _, key_out = Sites.Udemy.decrypt_udemy(wvd=wvd, in_pssh=values['-PSSH-'],
+                        _, key_out = Sites.Udemy.decrypt_udemy(wvd=wvd, in_pssh=values['-PSSH-'], in_license_url=values['-LIC_URL-'],
                                                                license_curl_headers=ast.literal_eval(clean_dict(dict=values['-HEADERS-'])),
                                                                license_curl_cookies=ast.literal_eval(clean_dict(dict=values['-COOKIES-'])))
                         window['-OUTPUT-'].update(f"{key_out}")
@@ -251,7 +251,7 @@ def start_gui(wvd: str = None, api_key: str = None):
                         window['-OUTPUT-'].update(f"No API key")
                     if api_key is not None:
                         try:
-                            _, key_out = Sites.Udemy.decrypt_udemy_remotely(api_key=api_key, in_pssh=values['-PSSH-'],
+                            _, key_out = Sites.Udemy.decrypt_udemy_remotely(api_key=api_key, in_pssh=values['-PSSH-'], in_license_url=values['-LIC_URL-'],
                                                                             license_curl_headers=ast.literal_eval(clean_dict(dict=values['-HEADERS-'])),
                                                                             license_curl_cookies=ast.literal_eval(clean_dict(dict=values['-COOKIES-'])))
                             window['-OUTPUT-'].update(f"{key_out}")
@@ -367,7 +367,7 @@ def start_gui(wvd: str = None, api_key: str = None):
         if event == 'Source Code':
             webbrowser.open(url='https://cdm-project.com/Decryption-Tools/TPD-Keys')
         if event == 'Version':
-            sg.popup('Version 1.31', custom_text='Close', grab_anywhere=True)
+            sg.popup('Version 1.32', custom_text='Close', grab_anywhere=True)
 
     # 4 - the close
     window.close()

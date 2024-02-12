@@ -60,28 +60,8 @@ def decrypt_generic(wvd: str = None, license_curl_headers: dict = None, mpd_url:
     # open CDM session
     session_id = cdm.open()
 
-    # get service certificate
-    service_cert = requests.post(
-        url=license_url,
-        data=cdm.service_certificate_challenge,
-        headers=license_curl_headers
-    )
-    if service_cert.status_code != 200:
-        print(f"Couldn't retrieve service cert\n{service_cert.content}")
-        return None, service_cert.content
-    else:
-        try:
-            service_cert = service_cert.content
-            cdm.set_service_certificate(session_id, service_cert)
-        except Exception as error:
-            print(f'an error occurred!\n{error}')
-            return None, error
-
-    # generate license challenge
-    if service_cert:
-        challenge = cdm.get_license_challenge(session_id, pssh, privacy_mode=True)
-    else:
-        challenge = cdm.get_license_challenge(session_id, pssh)
+    # Generate the challenge
+    challenge = cdm.get_license_challenge(session_id, pssh)
 
     # send license challenge
     license = requests.post(
@@ -94,15 +74,22 @@ def decrypt_generic(wvd: str = None, license_curl_headers: dict = None, mpd_url:
         print(f'An error occurred!\n{license.content}')
         return license.content
 
-    # Extract license from content
-    license = license.content
-
     # parse license challenge
     try:
-        cdm.parse_license(session_id, license)
-    except Exception as error:
-        print(f'an error occurred!\n{error}')
-        return None, error
+        cdm.parse_license(session_id, license.content)
+    except:
+        try:
+            cdm.parse_license(session_id, license.json().get('license'))
+        except:
+            try:
+                cdm.parse_license(session_id, license.json().get('licenseData'))
+            except:
+                try:
+                    cdm.parse_license(session_id, license.json().get('widevine2License'))
+                except Exception as error:
+                    print(f'an error occurred!\n{error}')
+                    return None, error
+
 
     # assign variable for returned keys
     returned_keys = ""
